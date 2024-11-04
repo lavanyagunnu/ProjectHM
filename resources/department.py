@@ -1,33 +1,38 @@
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from sqlalchemy.exc import SQLAlchemyError
-
 from db import db
-from models import DepartmentModel
-from schemas import DepartmentSchema
+from models import DepartmentModel  # Assume this model exists
+from schemas import DepartmentSchema, DepartmentUpdateSchema  # Assume these schemas exist
 
 blp = Blueprint("Departments", __name__, description="Operations on departments")
-
 
 @blp.route("/department/<int:department_id>")
 class Department(MethodView):
     @blp.response(200, DepartmentSchema)
     def get(self, department_id):
-        """Get a department by ID."""
+        """
+        Retrieve a specific department by ID.
+        """
         department = DepartmentModel.query.get_or_404(department_id)
         return department
 
     def delete(self, department_id):
-        """Delete a department."""
+        """
+        Delete a specific department by ID.
+        """
         department = DepartmentModel.query.get_or_404(department_id)
         db.session.delete(department)
         db.session.commit()
         return {"message": "Department deleted."}
 
-    @blp.arguments(DepartmentSchema)
+    @blp.arguments(DepartmentUpdateSchema)
     @blp.response(200, DepartmentSchema)
     def put(self, department_data, department_id):
-        """Update a department."""
+        """
+        Update a specific department by ID. If the department doesn't exist,
+        it will create a new department with the given ID.
+        """
         department = DepartmentModel.query.get(department_id)
 
         if department:
@@ -45,13 +50,17 @@ class Department(MethodView):
 class DepartmentList(MethodView):
     @blp.response(200, DepartmentSchema(many=True))
     def get(self):
-        """Get all departments."""
+        """
+        Retrieve all departments.
+        """
         return DepartmentModel.query.all()
 
     @blp.arguments(DepartmentSchema)
     @blp.response(201, DepartmentSchema)
     def post(self, department_data):
-        """Create a new department."""
+        """
+        Create a new department.
+        """
         department = DepartmentModel(**department_data)
 
         try:

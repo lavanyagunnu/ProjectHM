@@ -1,33 +1,28 @@
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from sqlalchemy.exc import SQLAlchemyError
-
 from db import db
-from models import RoomModel
-from schemas import RoomSchema
+from models import RoomModel  # Assume this model exists
+from schemas import RoomSchema, RoomUpdateSchema  # Assume these schemas exist
 
 blp = Blueprint("Rooms", __name__, description="Operations on rooms")
-
 
 @blp.route("/room/<int:room_id>")
 class Room(MethodView):
     @blp.response(200, RoomSchema)
     def get(self, room_id):
-        """Get a room by ID."""
         room = RoomModel.query.get_or_404(room_id)
         return room
 
     def delete(self, room_id):
-        """Delete a room."""
         room = RoomModel.query.get_or_404(room_id)
         db.session.delete(room)
         db.session.commit()
         return {"message": "Room deleted."}
 
-    @blp.arguments(RoomSchema)
+    @blp.arguments(RoomUpdateSchema)
     @blp.response(200, RoomSchema)
     def put(self, room_data, room_id):
-        """Update a room."""
         room = RoomModel.query.get(room_id)
 
         if room:
@@ -47,13 +42,11 @@ class Room(MethodView):
 class RoomList(MethodView):
     @blp.response(200, RoomSchema(many=True))
     def get(self):
-        """Get all rooms."""
         return RoomModel.query.all()
 
     @blp.arguments(RoomSchema)
     @blp.response(201, RoomSchema)
     def post(self, room_data):
-        """Create a new room."""
         room = RoomModel(**room_data)
 
         try:

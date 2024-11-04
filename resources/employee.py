@@ -1,39 +1,45 @@
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from sqlalchemy.exc import SQLAlchemyError
-
 from db import db
-from models import EmployeeModel
-from schemas import EmployeeSchema
+from models import EmployeeModel  # Assume this model exists
+from schemas import EmployeeSchema, EmployeeUpdateSchema  # Assume these schemas exist
 
 blp = Blueprint("Employees", __name__, description="Operations on employees")
-
 
 @blp.route("/employee/<int:employee_id>")
 class Employee(MethodView):
     @blp.response(200, EmployeeSchema)
     def get(self, employee_id):
-        """Get an employee by ID."""
+        """
+        Retrieve a specific employee by ID.
+        """
         employee = EmployeeModel.query.get_or_404(employee_id)
         return employee
 
     def delete(self, employee_id):
-        """Delete an employee."""
+        """
+        Delete a specific employee by ID.
+        """
         employee = EmployeeModel.query.get_or_404(employee_id)
         db.session.delete(employee)
         db.session.commit()
         return {"message": "Employee deleted."}
 
-    @blp.arguments(EmployeeSchema)
+    @blp.arguments(EmployeeUpdateSchema)
     @blp.response(200, EmployeeSchema)
     def put(self, employee_data, employee_id):
-        """Update an employee."""
+        """
+        Update a specific employee by ID. If the employee doesn't exist,
+        it will create a new employee with the given ID.
+        """
         employee = EmployeeModel.query.get(employee_id)
 
         if employee:
             employee.name = employee_data["name"]
-            employee.department_id = employee_data["department_id"]
             employee.role = employee_data["role"]
+            employee.salary = employee_data["salary"]
+            employee.department_id = employee_data.get("department_id", employee.department_id)
         else:
             employee = EmployeeModel(id=employee_id, **employee_data)
 
@@ -46,13 +52,17 @@ class Employee(MethodView):
 class EmployeeList(MethodView):
     @blp.response(200, EmployeeSchema(many=True))
     def get(self):
-        """Get all employees."""
+        """
+        Retrieve all employees.
+        """
         return EmployeeModel.query.all()
 
     @blp.arguments(EmployeeSchema)
     @blp.response(201, EmployeeSchema)
     def post(self, employee_data):
-        """Create a new employee."""
+        """
+        Create a new employee.
+        """
         employee = EmployeeModel(**employee_data)
 
         try:

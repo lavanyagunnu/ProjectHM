@@ -1,33 +1,28 @@
 from flask.views import MethodView
 from flask_smorest import Blueprint, abort
 from sqlalchemy.exc import SQLAlchemyError
-
 from db import db
-from models import DoctorModel
-from schemas import DoctorSchema
+from models import DoctorModel  # Assume this model exists
+from schemas import DoctorSchema, DoctorUpdateSchema  # Assume these schemas exist
 
 blp = Blueprint("Doctors", __name__, description="Operations on doctors")
-
 
 @blp.route("/doctor/<int:doctor_id>")
 class Doctor(MethodView):
     @blp.response(200, DoctorSchema)
     def get(self, doctor_id):
-        """Get a doctor by ID."""
         doctor = DoctorModel.query.get_or_404(doctor_id)
         return doctor
 
     def delete(self, doctor_id):
-        """Delete a doctor."""
         doctor = DoctorModel.query.get_or_404(doctor_id)
         db.session.delete(doctor)
         db.session.commit()
         return {"message": "Doctor deleted."}
 
-    @blp.arguments(DoctorSchema)
+    @blp.arguments(DoctorUpdateSchema)
     @blp.response(200, DoctorSchema)
     def put(self, doctor_data, doctor_id):
-        """Update a doctor."""
         doctor = DoctorModel.query.get(doctor_id)
 
         if doctor:
@@ -46,13 +41,11 @@ class Doctor(MethodView):
 class DoctorList(MethodView):
     @blp.response(200, DoctorSchema(many=True))
     def get(self):
-        """Get all doctors."""
         return DoctorModel.query.all()
 
     @blp.arguments(DoctorSchema)
     @blp.response(201, DoctorSchema)
     def post(self, doctor_data):
-        """Create a new doctor."""
         doctor = DoctorModel(**doctor_data)
 
         try:
