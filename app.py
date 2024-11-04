@@ -12,6 +12,7 @@ from resources.appointment import blp as AppointmentBlueprint
 from resources.prescription import blp as PrescriptionBlueprint
 from resources.billing import blp as BillingBlueprint
 from resources.department import blp as DepartmentBlueprint
+from resources.employee import blp as EmployeeBlueprint
 
 def create_app(db_url=None):
     app = Flask(__name__)
@@ -42,5 +43,6 @@ def create_app(db_url=None):
     api.register_blueprint(PrescriptionBlueprint)
     api.register_blueprint(BillingBlueprint)
     api.register_blueprint(DepartmentBlueprint)
+    api.register_blueprint(EmployeeBlueprint)
 
     return app

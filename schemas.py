@@ -12,6 +12,12 @@ class PatientSchema(PlainPatientSchema):
     appointments = fields.List(fields.Nested("AppointmentSchema", dump_only=True))
     room_id = fields.Int(load_only=True)
 
+class PatientUpdateSchema(Schema):
+    name = fields.Str()
+    age = fields.Int()
+    gender = fields.Str()
+    medical_history = fields.Str()
+
 # Doctor Schema
 class PlainDoctorSchema(Schema):
     id = fields.Int(dump_only=True)
@@ -22,6 +28,12 @@ class PlainDoctorSchema(Schema):
 class DoctorSchema(PlainDoctorSchema):
     appointments = fields.List(fields.Nested("AppointmentSchema", dump_only=True))
     department_id = fields.Int(load_only=True)
+
+class DoctorUpdateSchema(Schema):
+    name = fields.Str()
+    specialization = fields.Str()
+    availability = fields.Str()
+
 
 # Room Schema
 class PlainRoomSchema(Schema):
@@ -34,6 +46,12 @@ class PlainRoomSchema(Schema):
 class RoomSchema(PlainRoomSchema):
     ward = fields.Nested("WardSchema", dump_only=True)
     patient = fields.Nested("PatientSchema", dump_only=True)
+
+class RoomUpdateSchema(Schema):
+    ward_id = fields.Int()
+    patient_id = fields.Int(allow_none=True)
+    bed_number = fields.Str()
+    room_status = fields.Str()
 
 # Ward Schema
 class PlainWardSchema(Schema):
@@ -58,6 +76,14 @@ class AppointmentSchema(PlainAppointmentSchema):
     doctor = fields.Nested("DoctorSchema", dump_only=True)
     prescription = fields.Nested("PrescriptionSchema", dump_only=True)
 
+class AppointmentUpdateSchema(Schema):
+    patient_id = fields.Int()
+    doctor_id = fields.Int()
+    date = fields.Date()
+    time = fields.Time()
+
+
+
 # Prescription Schema
 class PlainPrescriptionSchema(Schema):
     id = fields.Int(dump_only=True)
@@ -68,6 +94,11 @@ class PlainPrescriptionSchema(Schema):
 
 class PrescriptionSchema(PlainPrescriptionSchema):
     appointment = fields.Nested("AppointmentSchema", dump_only=True)
+
+class PrescriptionUpdateSchema(Schema):
+    medicine_details = fields.Str()
+    dosage_details = fields.Str()
+    duration_days = fields.Int()
 
 # Billing Schema
 class PlainBillingSchema(Schema):
@@ -82,6 +113,11 @@ class BillingSchema(PlainBillingSchema):
     patient = fields.Nested("PatientSchema", dump_only=True)
     doctor = fields.Nested("DoctorSchema", dump_only=True)
 
+class BillingUpdateSchema(Schema):
+    total_amount = fields.Float()
+    date = fields.Date()
+    payment_status = fields.Str()
+
 # Department Schema
 class PlainDepartmentSchema(Schema):
     id = fields.Int(dump_only=True)
@@ -91,6 +127,10 @@ class PlainDepartmentSchema(Schema):
 class DepartmentSchema(PlainDepartmentSchema):
     doctors = fields.List(fields.Nested("DoctorSchema", dump_only=True))
     employees = fields.List(fields.Nested("EmployeeSchema", dump_only=True))
+
+class DepartmentUpdateSchema(Schema):
+    department_name = fields.Str()
+    head_of_department = fields.Str()
 
 # Employee Schema
 class PlainEmployeeSchema(Schema):
@@ -103,3 +143,10 @@ class PlainEmployeeSchema(Schema):
 
 class EmployeeSchema(PlainEmployeeSchema):
     department = fields.Nested("DepartmentSchema", dump_only=True)
+
+class EmployeeUpdateSchema(Schema):
+    name = fields.Str()
+    role = fields.Str()
+    salary = fields.Float()
+    department_id = fields.Int()
+    hire_date = fields.Date()
