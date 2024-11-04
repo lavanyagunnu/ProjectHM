@@ -7,6 +7,7 @@ class EmployeeModel(db.Model):
     name = db.Column(db.String(80), nullable=False)
     role = db.Column(db.String(80), nullable=False)
     salary = db.Column(db.Float, nullable=False)
-    department_id = db.Column(db.Integer, db.ForeignKey("departments.id"))
+    hire_date = db.Column(db.Date, nullable=False)
+    department_id = db.Column(db.Integer, db.ForeignKey("departments.id"), nullable=False)
 
     department = db.relationship("DepartmentModel", back_populates="employees")
