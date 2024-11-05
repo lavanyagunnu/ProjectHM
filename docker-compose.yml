@@ -6,3 +6,31 @@ services:
       - "5000:5000"
     volumes:
       - .:/app
+    environment:
+      DATABASE_URL: 'postgresql://postgres:password123@postgres/hospital_management'  # PostgreSQL connection URL
+
+  postgres:  # PostgreSQL service
+    image: postgres
+    container_name: postgres  # Container name
+    ports:
+      - '5432:5432'  # Expose PostgreSQL port
+    restart: always  # Restart policy
+    environment:  # Environment variables for PostgreSQL
+      POSTGRES_USER: postgres  # Default user
+      POSTGRES_PASSWORD: password123  # Default password
+      POSTGRES_DB: hospital_management  # Default database name
+    volumes:
+      - postgres-db:/var/lib/postgresql/data  # Persist data
+
+  pgadmin:  # pgAdmin service
+    container_name: pgadmin4  # Container name
+    image: dpage/pgadmin4  # pgAdmin image
+    restart: always  # Restart policy
+    environment:  # Environment variables for pgAdmin
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com  # Admin email
+      PGADMIN_DEFAULT_PASSWORD: root  # Admin password
+    ports:
+      - "5050:80"  # Expose pgAdmin port
+
+volumes:  # Define a volume for PostgreSQL data persistence
+  postgres-db:
